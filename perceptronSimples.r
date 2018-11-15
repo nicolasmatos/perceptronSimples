@@ -1,47 +1,3 @@
-perceptron <- function(treinamento, k, e) {
-  distancias<-c()
-  for (i in 1: (nrow(treinamento))) {
-    distancias[i] = sqrt((treinamento[i,1] - e[1])^2 + (treinamento[i,2] - e[2])^2 + (treinamento[i,3] - e[3])^2 + (treinamento[i,4] - e[4])^2)
-  }
-  
-  menoresCoordenadas<-list()
-  menoresDistancias<-c()
-  c1 = 0
-  c2 = 0
-  c3 = 0
-  for (i in 1: k) {
-    menor = min(distancias)
-    indiceMenorDistancia = match(menor,distancias)
-    
-    menoresDistancias[i] = menor
-    menoresCoordenadas[[i]] = treinamento[indiceMenorDistancia,]
-    
-    distancias[indiceMenorDistancia] = 1000000
-    
-    if(treinamento[indiceMenorDistancia,5] == 1) {
-      c1 = c1 + 1
-    }
-    else if(treinamento[indiceMenorDistancia,5] == 2) {
-      c2 = c2 + 1
-    }
-    else {
-      c3 = c3 + 1
-    }
-  }
-  
-  classes<-c(c1,c2,c3)
-  
-  #Retornando uma lista com as probabilidades
-  ret = list()
-  ret$menoresCoordenadas = menoresCoordenadas
-  ret$menoresDistancias = menoresDistancias
-  ret$e = e
-  ret$classe = match(max(classes),classes)
-  ret$acertou = match(max(classes),classes) == e[5]
-  
-  return (ret)
-}
-
 gerarTreinoTeste <- function(classe1, classe2, classe3, classe4, classe5, classe6) {
   #Embaralhando os datasets das classes
   classe1 <- classe1[sample(1:nrow(classe1)), ]
@@ -51,6 +7,7 @@ gerarTreinoTeste <- function(classe1, classe2, classe3, classe4, classe5, classe
   classe5 <- classe5[sample(1:nrow(classe5)), ]
   classe6 <- classe6[sample(1:nrow(classe6)), ]
   
+  library(dplyr)
   dataTreinoClasse1<-sample_frac(classe1, 0.80)
   dataTesteClasse1<-setdiff(classe1, dataTreinoClasse1)
   
@@ -350,6 +307,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   
   resultado$txAcertos = txAcertos
   resultado$txErros = 1 - txAcertos
+  resultado$grafico = (plot(resultado$txErros~c(1:n)))
   #resultado$txAcertosMin = min(txAcertos)  
   #resultado$txAcertosMax = max(txAcertos)
   #resultado$txAcertosMed = median(txAcertos)
