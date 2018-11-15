@@ -146,6 +146,9 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     
     #return(r)
     
+    #Criando a nova matriz de pesos
+    wPesosNovo<-matrix((34*6), nrow = 34, ncol = 6) 
+    
     for (i in 1: (nrow(dataTreino))) {
       #Recebe a linha atual do conjunto de treino
       linhaTreino = dataTreino[i,]
@@ -156,7 +159,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       #Transformando a linha em uma matriz
       vX<-c()
       for (j in 1:33) {
-        vX[j] = as.numeric(linhaTreino[[j]])
+        vX[j] = as.numeric(gsub(",", ".", linhaTreino[[j]]))
       }
       #Adicionando o valor para representar o x0
       vX[34] = -1
@@ -168,7 +171,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       #Montando o y
       vY<-c()
       for (j in 1:6) {
-        if(u[,j] <= 0) {
+        if(u[,j] <= 0.0) {
           vY[j] = 0
         }
         else {
@@ -222,7 +225,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       #Transformando a linha em uma matriz
       vX<-c()
       for (j in 1:33) {
-        vX[j] = as.numeric(linhaTeste[[j]])
+        vX[j] = as.numeric(gsub(",", ".", linhaTeste[[j]]))
       }
       #Adicionando o valor para representar o x0
       vX[34] = -1
@@ -234,7 +237,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       #Montando o y
       vY<-c()
       for (j in 1:6) {
-        if(u[,j] <= 0) {
+        if(u[,j] <= 0.0) {
           vY[j] = 0
         }
         else {
@@ -266,7 +269,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       }
       
       #Verificando se o algoritmo acertou na classificação
-      if (vE == c(0, 0, 0, 0, 0, 0)) {
+      if (vE[1] == 0 && vE[2] == 0 && vE[3] == 0 && vE[4] == 0 && vE[5] == 0 && vE[6] == 0) {
         if (nClasse == 1) {
           qntAcertosUm = qntAcertosUm + 1
         }
@@ -339,19 +342,23 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     txAcertosQuatro[k]<-txAcertoQuatro
     txAcertosCinco[k]<-txAcertoCinco
     txAcertosSeis[k]<-txAcertoSeis
+    
+    wPesos = wPesosNovo
   }
   
   resultado = list()
   
-  resultado$txAcertosMin = min(txAcertos)  
-  resultado$txAcertosMax = max(txAcertos)
-  resultado$txAcertosMed = median(txAcertos)
-  resultado$txAcertosUmMed = median(txAcertosUm)
-  resultado$txAcertosDoisMed = median(txAcertosDois)
-  resultado$txAcertosTresMed = median(txAcertosTres)
-  resultado$txAcertosQuatroMed = median(txAcertosQuatro)
-  resultado$txAcertosCincoMed = median(txAcertosCinco)
-  resultado$txAcertosSeisMed = median(txAcertosSeis)
+  resultado$txAcertos = txAcertos
+  resultado$txErros = 1 - txAcertos
+  #resultado$txAcertosMin = min(txAcertos)  
+  #resultado$txAcertosMax = max(txAcertos)
+  #resultado$txAcertosMed = median(txAcertos)
+  #resultado$txAcertosUmMed = median(txAcertosUm)
+  #resultado$txAcertosDoisMed = median(txAcertosDois)
+  #resultado$txAcertosTresMed = median(txAcertosTres)
+  #resultado$txAcertosQuatroMed = median(txAcertosQuatro)
+  #resultado$txAcertosCincoMed = median(txAcertosCinco)
+  #resultado$txAcertosSeisMed = median(txAcertosSeis)
   
   return (resultado)
 }
