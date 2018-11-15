@@ -79,7 +79,42 @@ gerarTreinoTeste <- function(classe1, classe2, classe3, classe4, classe5, classe
   return(r)
 }
 
-processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, classe6, n) {
+classeDesejada <- function(classe) {
+  desejado<-c()
+  if(classe == 1) {
+    desejado<-c(1, 0, 0, 0, 0, 0)
+  }
+  else if(classe == 2) {
+    desejado<-c(0, 1, 0, 0, 0, 0)
+  }
+  else if(classe == 3) {
+    desejado<-c(0, 0, 1, 0, 0, 0)
+  }
+  else if(classe == 4) {
+    desejado<-c(0, 0, 0, 1, 0, 0)
+  }
+  else if(classe == 5) {
+    desejado<-c(0, 0, 0, 0, 1, 0)
+  }
+  else {
+    desejado<-c(0, 0, 0, 0, 0, 1)
+  }
+  
+  return(desejado)
+}
+
+aprendizagem <- function(wPesos, xLinhaTreino, vE, pA) {
+  wPesosNovo<-matrix((34*6), nrow = 34, ncol = 6) 
+  for (i in 1:6) {
+    for (j in 1:34) {
+      wPesosNovo[j,i] = wPesos[j,i] + (pA * vE[i] * xLinhaTreino[,j])
+    }
+  }
+  
+  return(wPesosNovo)
+}
+
+processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, classe6, n, pA) {
   txAcertos<-c()
   txAcertosUm<-c()
   txAcertosDois<-c()
@@ -89,10 +124,11 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   txAcertosSeis<-c()
   
   #Criando uma matriz aleatória de pesos
-  wPesos<-matrix(runif(33*6), nrow = 33, ncol = 6) 
+  #OBS: Os pesos da linha 34 são os bias
+  wPesos<-matrix(runif(34*6), nrow = 34, ncol = 6) 
   
   #Laço para rodar n vezes a base de teste
-  for (j in 1:n) {
+  for (k in 1:n) {
     #Função para gerar dataset de treino e teste
     treinoTeste = gerarTreinoTeste(classe1, classe2, classe3, classe4, classe5, classe6)
     dataTreino = treinoTeste$dataTreino
@@ -114,20 +150,46 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       #Recebe a linha atual do conjunto de treino
       linhaTreino = dataTreino[i,]
       
+      #Montando o vetor desejado
+      vD = classeDesejada(linhaTreino[34])
+      
       #Transformando a linha em uma matriz
-      v<-c()
+      vX<-c()
       for (j in 1:33) {
-        v[j] = as.numeric(linhaTreino[[j]])
+        vX[j] = as.numeric(linhaTreino[[j]])
       }
-      xLinhaTreino = matrix(v, 1, 33)
+      #Adicionando o valor para representar o x0
+      vX[34] = -1
+      xLinhaTreino = matrix(vX, 1, 34)
       
       #Multiplicando a linha de entrada pela matriz de pesos
       u = xLinhaTreino %*% wPesos
       
+      #Montando o y
+      vY<-c()
+      for (j in 1:6) {
+        if(u[,j] <= 0) {
+          vY[j] = 0
+        }
+        else {
+          vY[j] = 1
+        }
+      }
+      
+      #Gerando o vetor de erro(Vetor desejado - Vetor obtido)
+      vE = vD - vY
+      
+      #Aplicado a regra de aprendizagem para atualização dos pesos
+      wPesosNovo = aprendizagem(wPesos, xLinhaTreino, vE, pA)
+      
       r = list()
       r$xLinhaTreino = xLinhaTreino
       r$wPesos = wPesos
+      r$wPesosNovo = wPesosNovo
       r$u = u
+      r$d = vD
+      r$y = vY
+      r$e = vE
       
       return(r)
     }
@@ -225,13 +287,13 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     
     #return(r)
     
-    txAcertos[j]<-txAcerto
-    txAcertosUm[j]<-txAcertoUm
-    txAcertosDois[j]<-txAcertoDois
-    txAcertosTres[j]<-txAcertoTres
-    txAcertosQuatro[j]<-txAcertoQuatro
-    txAcertosCinco[j]<-txAcertoCinco
-    txAcertosSeis[j]<-txAcertoSeis
+    txAcertos[k]<-txAcerto
+    txAcertosUm[k]<-txAcertoUm
+    txAcertosDois[k]<-txAcertoDois
+    txAcertosTres[k]<-txAcertoTres
+    txAcertosQuatro[k]<-txAcertoQuatro
+    txAcertosCinco[k]<-txAcertoCinco
+    txAcertosSeis[k]<-txAcertoSeis
   }
   
   resultado = list()
