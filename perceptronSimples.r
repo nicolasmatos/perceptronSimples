@@ -127,7 +127,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   #OBS: Os pesos da linha 34 são os bias
   wPesos<-matrix(runif(34*6), nrow = 34, ncol = 6) 
   
-  #Laço para rodar n vezes a base de teste
+  #Laço para rodar n vezes
   for (k in 1:n) {
     #Função para gerar dataset de treino e teste
     treinoTeste = gerarTreinoTeste(classe1, classe2, classe3, classe4, classe5, classe6)
@@ -182,16 +182,16 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
       #Aplicado a regra de aprendizagem para atualização dos pesos
       wPesosNovo = aprendizagem(wPesos, xLinhaTreino, vE, pA)
       
-      r = list()
-      r$xLinhaTreino = xLinhaTreino
-      r$wPesos = wPesos
-      r$wPesosNovo = wPesosNovo
-      r$u = u
-      r$d = vD
-      r$y = vY
-      r$e = vE
+      #r = list()
+      #r$xLinhaTreino = xLinhaTreino
+      #r$wPesos = wPesos
+      #r$wPesosNovo = wPesosNovo
+      #r$u = u
+      #r$d = vD
+      #r$y = vY
+      #r$e = vE
       
-      return(r)
+      #return(r)
     }
     
     #Variáveis para controlar os acertos do algoritmo
@@ -210,35 +210,80 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     
     #Laço para percorrer todas as linha do dataframe de teste
     for (i in 1: (nrow(dataTeste))) {
-      #Recebe a linha atual do conjunto de teste
-      linha = dataTeste[i,]
-
-      #Chamando a função que classifica a linha atual
-      resultKnn = knn(dataTreino, k, linha)
+      #Recebe a linha atual do conjunto de treino
+      linhaTeste = dataTeste[i,]
       
-      #return(resultKnn)
+      #Montando o vetor desejado
+      vD = classeDesejada(linhaTeste[34])
+      
+      #Guardando o número da classe que está sendo testada
+      nClasse = linhaTeste[34]
+      
+      #Transformando a linha em uma matriz
+      vX<-c()
+      for (j in 1:33) {
+        vX[j] = as.numeric(linhaTeste[[j]])
+      }
+      #Adicionando o valor para representar o x0
+      vX[34] = -1
+      xLinhaTeste = matrix(vX, 1, 34)
+      
+      #Multiplicando a linha de entrada pela nova matriz de pesos
+      u = xLinhaTeste %*% wPesosNovo
+      
+      #Montando o y
+      vY<-c()
+      for (j in 1:6) {
+        if(u[,j] <= 0) {
+          vY[j] = 0
+        }
+        else {
+          vY[j] = 1
+        }
+      }
+      
+      #Gerando o vetor de erro(Vetor desejado - Vetor obtido)
+      vE = vD - vY
       
       #Verificando quantas chamadas teve de cada classe
-      if (resultKnn$e[5] == 1) {
+      if (nClasse == 1) {
         qntUm = qntUm + 1
       }
-      else if (resultKnn$e[5] == 2) {
+      else if (nClasse == 2) {
         qntDois = qntDois + 1
       }
-      else {
+      else if (nClasse == 3) {
         qntTres = qntTres + 1
+      }
+      else if (nClasse == 4) {
+        qntQuatro = qntQuatro + 1
+      }
+      else if (nClasse == 5) {
+        qntCinco = qntCinco + 1
+      }
+      else {
+        qntSeis = qntSeis + 1
       }
       
       #Verificando se o algoritmo acertou na classificação
-      if (resultKnn$acertou) {
-        if(resultKnn$classe == 1) {
+      if (vE == c(0, 0, 0, 0, 0, 0)) {
+        if (nClasse == 1) {
           qntAcertosUm = qntAcertosUm + 1
         }
-        else if(resultKnn$classe == 2) {
+        else if (nClasse == 2) {
           qntAcertosDois = qntAcertosDois + 1
         }
-        else {
+        else if (nClasse == 3) {
           qntAcertosTres = qntAcertosTres + 1
+        }
+        else if (nClasse == 4) {
+          qntAcertosQuatro = qntAcertosQuatro + 1
+        }
+        else if (nClasse == 5) {
+          qntAcertosCinco = qntAcertosCinco + 1
+        }
+        else {
+          qntAcertosSeis = qntAcertosSeis + 1
         }
       }
     }
@@ -309,68 +354,4 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   resultado$txAcertosSeisMed = median(txAcertosSeis)
   
   return (resultado)
-}
-
-processaKnn2 <- function(classe1, classe2, classe3, k) {
-  txMedAcertos<-c()
-  testes<-c()
-  
-  #Laço para alterar as proporções de 1 em 1 de 20 até 80
-  for (k in 1:61) {
-    txAcertos<-c()
-    
-    #Laço para rodar 30vezes a base de teste
-    for (j in 1:30) {
-      #Embaralhando a base original
-      classe1 <- classe1[sample(1:nrow(classe1)), ]
-      classe2 <- classe2[sample(1:nrow(classe2)), ]
-      classe3 <- classe3[sample(1:nrow(classe3)), ]
-      
-      #Quebrando o dataset em treino e teste (80/20) OBS: Buscando as linhas de forma aleotória
-      library(dplyr)
-      dataTreinoClasse1<-sample_frac(classe1, (0.19 + (k/100)))
-      dataTesteClasse1<-setdiff(classe1, dataTreinoClasse1)
-      
-      dataTreinoClasse2<-sample_frac(classe2, (0.19 + (k/100)))
-      dataTesteClasse2<-setdiff(classe2, dataTreinoClasse2)
-      
-      dataTreinoClasse3<-sample_frac(classe3, (0.19 + (k/100)))
-      dataTesteClasse3<-setdiff(classe3, dataTreinoClasse3)
-      
-      dataTreino <- rbind(dataTreinoClasse1, dataTreinoClasse2, dataTreinoClasse3)
-      dataTeste <- rbind(dataTesteClasse1, dataTesteClasse2, dataTesteClasse3)
-      
-      #Variável para controlar os acertos do algoritmo
-      qntAcertosTotal = 0
-      
-      #Laço para percorrer todas as linha do dataframe de teste
-      for (i in 1: (nrow(dataTeste))) {
-        #Recebe a linha atual do conjunto de teste
-        linha = dataTeste[i,]
-        
-        #Chamando a função que classifica a linha atual
-        resultKnn = knn(dataTreino, k, linha)
-        
-        #Verificando se o algoritmo acertou na classificação
-        if (resultKnn$acertou) {
-          qntAcertosTotal = qntAcertosTotal + 1
-        }
-      }
-      
-      #Calculando a taxa de acertos (Numero de acertos total / Quantidade de elementos testados)
-      txAcerto = qntAcertosTotal / nrow(dataTeste)
-      
-      txAcertos[j]<-txAcerto
-    }
-    
-    txMedAcertos[k]<-median(txAcertos)
-    testes[k]<-(0.19 + (k/100))
-  }
-  
-  resultado = list()
-  
-  resultado$txMedAcertos = txMedAcertos 
-  resultado$testes = testes
-  
-  return (plot(resultado$txMedAcertos~resultado$testes))
 }
