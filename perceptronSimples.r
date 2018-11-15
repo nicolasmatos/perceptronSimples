@@ -89,7 +89,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   txAcertosSeis<-c()
   
   #Criando uma matriz aleatória de pesos
-  pesos<-matrix(runif(33*6), nrow = 33, ncol = 6) 
+  wPesos<-matrix(runif(33*6), nrow = 33, ncol = 6) 
   
   #Laço para rodar n vezes a base de teste
   for (j in 1:n) {
@@ -101,7 +101,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     #r = list()
     #r$qtd1 = nrow(classe1)
     #r$qtd2 = nrow(classe2)
-    #$qtd3 = nrow(classe3)
+    #r$qtd3 = nrow(classe3)
     #r$qtd4 = nrow(classe4)
     #r$qtd5 = nrow(classe5)
     #r$qtd6 = nrow(classe6)
@@ -113,13 +113,23 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     for (i in 1: (nrow(dataTreino))) {
       #Recebe a linha atual do conjunto de treino
       linhaTreino = dataTreino[i,]
+      
+      #Transformando a linha em uma matriz
       v<-c()
       for (j in 1:33) {
         v[j] = as.numeric(linhaTreino[[j]])
       }
-      linhaTreino = matrix(v, 1, 33)
+      xLinhaTreino = matrix(v, 1, 33)
       
-      return(linhaTreino)
+      #Multiplicando a linha de entrada pela matriz de pesos
+      u = xLinhaTreino %*% wPesos
+      
+      r = list()
+      r$xLinhaTreino = xLinhaTreino
+      r$wPesos = wPesos
+      r$u = u
+      
+      return(r)
     }
     
     #Variáveis para controlar os acertos do algoritmo
