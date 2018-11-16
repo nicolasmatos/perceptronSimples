@@ -307,7 +307,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   
   resultado$txAcertos = txAcertos
   resultado$txErros = 1 - txAcertos
-  resultado$grafico1 = plot(resultado$txErros~c(1:n), type="l", main=paste("Gráfico com as taxas de acerto e erro do algoritmo Perceptron Simples para", n, "entradas", sep=" "), xlab="Número de rodadas", ylab="Taxa de erro/acerto %", col="red", ylim=c(0,1))
+  resultado$grafico1 = plot(resultado$txErros~c(1:n), type="l", main=paste("Gráfico com as taxas de acerto e erro do algoritmo Perceptron Simples para", n, "rodadas", sep=" "), xlab="Número de rodadas", ylab="Taxa de erro/acerto %", col="red", ylim=c(0,1))
   resultado$grafico2 = lines(c(1:n), resultado$txAcertos,col="blue")
   #resultado$grafico3 = legend(1, 1.3, c("Taxa acerto","Taxa erro"), col =c("blue","red"), pch=rep(10,2))
   #resultado$txAcertosMin = min(txAcertos)  
