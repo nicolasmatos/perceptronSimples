@@ -84,6 +84,7 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   #OBS: Os pesos da linha 34 são os bias
   wPesos<-matrix(runif(34*6), nrow = 34, ncol = 6) 
   
+  numeroRodadas = 0
   #Laço para rodar n vezes
   for (k in 1:n) {
     #Função para gerar dataset de treino e teste
@@ -300,25 +301,34 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
     txAcertosCinco[k]<-txAcertoCinco
     txAcertosSeis[k]<-txAcertoSeis
     
-    wPesos = wPesosNovo
+    numeroRodadas = k
+    
+    #Critério de para: Se a nova matriz de peso não mudar para o treinamento
+    #if(all(wPesos == wPesosNovo)) {
+    if(FALSE) {
+      break
+    }
+    else {
+      wPesos = wPesosNovo
+    }
   }
   
   resultado = list()
   
   resultado$txAcertos = txAcertos
   resultado$txErros = 1 - txAcertos
-  resultado$grafico1 = plot(resultado$txErros~c(1:n), type="l", main=paste("Gráfico com as taxas de acerto e erro do algoritmo Perceptron Simples para", n, "rodadas", sep=" "), xlab="Número de rodadas", ylab="Taxa de erro/acerto %", col="red", ylim=c(0,1))
-  resultado$grafico2 = lines(c(1:n), resultado$txAcertos,col="blue")
+  resultado$grafico1 = plot(resultado$txErros~c(1:numeroRodadas), type="l", main=paste("Gráfico com as taxas de acerto e erro do algoritmo Perceptron Simples para", numeroRodadas, "rodadas", sep=" "), xlab="Número de rodadas", ylab="Taxa de erro/acerto %", col="red", ylim=c(0,1))
+  resultado$grafico2 = lines(c(1:numeroRodadas), resultado$txAcertos,col="blue")
   #resultado$grafico3 = legend(1, 1.3, c("Taxa acerto","Taxa erro"), col =c("blue","red"), pch=rep(10,2))
-  #resultado$txAcertosMin = min(txAcertos)  
-  #resultado$txAcertosMax = max(txAcertos)
-  #resultado$txAcertosMed = median(txAcertos)
-  #resultado$txAcertosUmMed = median(txAcertosUm)
-  #resultado$txAcertosDoisMed = median(txAcertosDois)
-  #resultado$txAcertosTresMed = median(txAcertosTres)
-  #resultado$txAcertosQuatroMed = median(txAcertosQuatro)
-  #resultado$txAcertosCincoMed = median(txAcertosCinco)
-  #resultado$txAcertosSeisMed = median(txAcertosSeis)
+  resultado$txErrosMin = min(resultado$txErros)  
+  resultado$txErrosMax = max(resultado$txErros)
+  resultado$txErrosMed = median(resultado$txErros)
+  resultado$txErrosUmMed = median(resultado$txErros)
+  resultado$txErrosDoisMed = median(resultado$txErros)
+  resultado$txErrosTresMed = median(resultado$txErros)
+  resultado$txErrosQuatroMed = median(resultado$txErros)
+  resultado$txErrosCincoMed = median(resultado$txErros)
+  resultado$txErrosSeisMed = median(resultado$txErros)
   
   return (resultado)
 }
