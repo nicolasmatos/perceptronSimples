@@ -29,6 +29,10 @@ gerarTreinoTeste <- function(classe1, classe2, classe3, classe4, classe5, classe
   dataTreino <- rbind(dataTreinoClasse1, dataTreinoClasse2, dataTreinoClasse3, dataTreinoClasse4, dataTreinoClasse5, dataTreinoClasse6)
   dataTeste <- rbind(dataTesteClasse1, dataTesteClasse2, dataTesteClasse3, dataTesteClasse4, dataTesteClasse5, dataTesteClasse6)
   
+  
+  dataTreino <- dataTreino[sample(1:nrow(dataTreino)), ]
+  dataTeste <- dataTeste[sample(1:nrow(dataTeste)), ]
+  
   r = list()
   r$dataTreino = dataTreino
   r$dataTeste = dataTeste
@@ -323,6 +327,9 @@ processaPerceptron <- function(classe1, classe2, classe3, classe4, classe5, clas
   resultado$txErrosMin = min(resultado$txErros)  
   resultado$txErrosMax = max(resultado$txErros)
   resultado$txErrosMed = median(resultado$txErros)
+  resultado$txAcertosMin = min(txAcertos)  
+  resultado$txAcertosMax = max(txAcertos)
+  resultado$txAcertosMed = median(txAcertos)
   resultado$txErrosUmMed = median(resultado$txErros)
   resultado$txErrosDoisMed = median(resultado$txErros)
   resultado$txErrosTresMed = median(resultado$txErros)
